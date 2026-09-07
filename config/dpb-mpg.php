@@ -8,7 +8,7 @@ use Dpb\Insights\Filament\Pages\InsightsPage;
 use Dpb\Spotlight\Components\Livewire\SpotlightTriggerComponent;
 use Dpb\Spotlight\Models\SpotlightStep;
 use Dpb\WorkTimeFund\Filament\Pages\DeferredTasksManagement\DeferredTasksManagementPage;
-use Dpb\WorkTimeFund\Filament\Pages\OperationsCategoryManagementPage;
+// use Dpb\WorkTimeFund\Filament\Pages\OperationsCategoryManagementPage;
 use Dpb\WorkTimeFund\Models\Absence;
 use Dpb\WorkTimeFund\Models\ActivityRecord;
 use Dpb\WorkTimeFund\Models\Category;
@@ -29,7 +29,7 @@ return [
                 // Pages
                 InsightsPage::getAccessPermission(),
                 OperationsManagementPage::getAccessPermission(),
-                OperationsCategoryManagementPage::getAccessPermission(),
+                // OperationsCategoryManagementPage::getAccessPermission(),
                 WorktimeManagementPage::getAccessPermission(),
                 EmployeeManagerPage::getAccessPermission(),
                 DeferredTasksManagementPage::getAccessPermission(),

@@ -19,7 +19,6 @@
         {"type": "vcs", "url": "git@github.com:dp-bratislava/dpb-utils.git"},
         {"type": "vcs", "url": "git@github.com:dp-bratislava/dpb-work-time-fund-filament.git"},
         {"type": "vcs", "url": "git@github.com:dp-bratislava/dpb-work-time-fund.git"},
-        {"type": "vcs", "url": "git@github.com:dp-bratislava/dpb-wtf-tms-bridge.git"},
         {"type": "vcs", "url": "git@github.com:dp-bratislava/dpb-wtf-ui.git"},
         {"type": "vcs", "url": "git@github.com:dp-bratislava/ext-spatie-model-states.git"},
         {"type": "vcs", "url": "git@github.com:dp-bratislava/filament-admin-panel.git"},
@@ -37,12 +36,16 @@
         {"type": "vcs", "url": "git@github.com:dp-bratislava/pkg-tickets.git"},
         {"type": "vcs", "url": "git@github.com:dp-bratislava/pkg-work-log.git"},
         {"type": "vcs", "url": "git@github.com:dp-bratislava/pkg-closing-summary.git"},
-        {"type": "vcs", "url": "git@github.com:dp-bratislava/ui-components.git"}
+        {"type": "vcs", "url": "git@github.com:dp-bratislava/ui-components.git"},
+        
+        {"type": "vcs", "url": "git@github.com:dp-bratislava/pkg-assets.git"},
+        {"type": "path", "url": "packages/dpb/dpb-wtf-tms-bridge", "options": {"symlink": true}}        
     ],
     "require": {
         "php": "^8.2",
+        "dpb/dpb-wtf-tms-bridge": "dev-main as 12.5.14",
+
         "deployer/deployer": "^7.4",
-        "dpb/dpb-wtf-tms-bridge": "~12.5.0",
         "dpb/filament-admin-panel": "^5.0",
         "dpb/laravel-datahub-sync": "^12.4",
         "dpb/laravel-user-admin": "^5.4",

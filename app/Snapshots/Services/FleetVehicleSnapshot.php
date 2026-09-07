@@ -97,11 +97,19 @@ class FleetVehicleSnapshot extends Snapshot
     protected function map(): array
     {
         return [
+            'vin' => 'v.vin',
             'vehicle_id' => 'v.id',
             'code' => 'vc.`code`',
             'licence_plate' => 'lp.`code`',
             'model' => 'vm.title',
             'type' => 'vt.title',
+            'maintenance_group_code' => 'mg.code',
+            'maintenance_group_title' => 'mg.title',
+            'length' => 'vm.length',
+            'seats' => 'vm.seats',
+            'maintenance_group_id' => 'mg.id',
+            'model_id' => 'vm.id',
+            'type_id' => 'vt.id',
             'updated_at' => 'v.updated_at',
         ];
     }
@@ -117,6 +125,7 @@ class FleetVehicleSnapshot extends Snapshot
             LEFT JOIN fleet_vehicle_codes vc ON vc.id = lc.vehicle_code_id
             LEFT JOIN latest_plate lp_ref ON lp_ref.vehicle_id = v.id
             LEFT JOIN fleet_licence_plates lp ON lp.id = lp_ref.licence_plate_id
+            LEFT JOIN fleet_maintenance_groups mg ON mg.id = v.maintenance_group_id
         ";
     }
 }
