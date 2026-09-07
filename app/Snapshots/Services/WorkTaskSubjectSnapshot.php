@@ -43,6 +43,7 @@ class WorkTaskSubjectSnapshot extends Snapshot
                         ELSE NULL
                     END AS type,
                     t.maintainable_id AS entity_id,
+                    t.department_id AS department_id,
                     t.updated_at as updated_at
                 FROM dpb_worktimefund_model_task t
                     JOIN {$tempTable} tmp ON tmp.id = t.id
@@ -56,12 +57,14 @@ class WorkTaskSubjectSnapshot extends Snapshot
                         tr.label, 
                         ao.label
                     ) AS label,
+                    deps.code AS department_code,
                     sb.updated_at
                 FROM subject_base sb
                     LEFT JOIN fleet_vehicles v 
                         ON v.id = sb.entity_id AND sb.type = 'Vozidlo'
                     LEFT JOIN mvw_fleet_vehicle_snapshots fvs 
                         ON fvs.vehicle_id = v.id AND sb.type = 'Vozidlo'
+                    JOIN datahub_departments deps ON deps.id = sb.department_id
                     LEFT JOIN table_resolved tr ON tr.device_id = sb.entity_id AND sb.type = 'Zastávková tabuľa'
                     LEFT JOIN dpb_worktimefund_mm_morphable_attributeoption mao ON mao.morphable_id = sb.task_id AND mao.morphable_type = 'Dpb\\\\WorkTimeFund\\\\Models\\\\Task'
                     LEFT JOIN dpb_worktimefund_model_attributeoption ao ON ao.id = mao.attributeoption_id
@@ -141,6 +144,7 @@ class WorkTaskSubjectSnapshot extends Snapshot
             'wtf_task_id' => 'sr.task_id',
             'subject_type' => 'sr.type',
             'subject_label' => 'sr.label',
+            'department_code' => 'sr.department_code',
             'updated_at' => 'sr.updated_at',
         ];
     }

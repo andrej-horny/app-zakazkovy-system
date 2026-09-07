@@ -17,6 +17,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Carbon;
 
 class DetailReport implements ReportDriver
 {
@@ -47,10 +48,9 @@ class DetailReport implements ReportDriver
         $departmentValues = $this->departmentService->getAvailableDepartments()->pluck('code');
 
         $subjectTypesWithDepartments = WorkTaskSubject::query()
-            ->join('mvw_work_activity_report_v2', 'mvw_work_task_subject_snapshots.wtf_task_id', '=', 'mvw_work_activity_report_v2.wtf_task_id') // Adjust foreign/primary keys to match your schema
-            ->whereIn('mvw_work_activity_report_v2.department_code', $departmentValues)
-            ->groupBy('mvw_work_task_subject_snapshots.subject_type', 'mvw_work_activity_report_v2.department_code')
-            ->select('mvw_work_task_subject_snapshots.subject_type', 'mvw_work_activity_report_v2.department_code')
+            ->whereIn('department_code', $departmentValues)
+            ->select('subject_type', 'department_code')
+            ->distinct()
             ->get()
             ->groupBy('subject_type')
             ->map(fn ($group) => $group->pluck('department_code')->toArray());
@@ -187,11 +187,19 @@ class DetailReport implements ReportDriver
                     return $query
                         ->when(
                             $data['date_from'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('activity_date', '>=', $date)
+                            fn (Builder $query, $date): Builder => $query->where(
+                                'activity_date',
+                                '>=',
+                                Carbon::parse($date)->startOfDay()
+                            )
                         )
                         ->when(
                             $data['date_to'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('activity_date', '<=', $date)
+                            fn (Builder $query, $date): Builder => $query->where(
+                                'activity_date',
+                                '<=',
+                                Carbon::parse($date)->endOfDay()
+                            )
                         );
                 })
                 ->columns(2),
