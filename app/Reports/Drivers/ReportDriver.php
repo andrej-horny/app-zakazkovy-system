@@ -32,6 +32,10 @@ interface ReportDriver
      */
     public function getFilters(): array;
 
+    public function getSortColumn(): string;
+
+    public function getSortOrder(): string;
+
     public function getExporter(): string;
 
     public function generateExportFilename(): string;

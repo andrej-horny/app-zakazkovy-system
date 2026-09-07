@@ -214,6 +214,16 @@ class DetailReport implements ReportDriver
         ];
     }
 
+    public function getSortColumn(): string
+    {
+        return 'activity_date';
+    }
+
+    public function getSortOrder(): string
+    {
+        return 'desc';
+    }
+
     public function getExporter(): string
     {
         return DetailReportExporter::class;

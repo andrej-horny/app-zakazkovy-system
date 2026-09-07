@@ -12,6 +12,7 @@ return new class extends Migration
             $table->string('department_code')
                 ->nullable()
                 ->after('subject_label');
+            $table->index(['department_code','subject_type'], 'mvw_work_task_subject_snapshots_idx_dep_code_sub_type');
         });
     }
 
@@ -19,6 +20,7 @@ return new class extends Migration
     {
         Schema::table('mvw_work_task_subject_snapshots', function (Blueprint $table) {
             $table->dropColumn('department_code');
+            $table->dropIndex('mvw_work_task_subject_snapshots_idx_dep_code_sub_type');
         });
     }
 };
