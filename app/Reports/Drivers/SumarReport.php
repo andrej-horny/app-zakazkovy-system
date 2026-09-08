@@ -16,6 +16,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Carbon;
 
 class SumarReport implements ReportDriver
 {
@@ -118,11 +119,11 @@ class SumarReport implements ReportDriver
                     return $query
                         ->when(
                             $data['date_from'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('dpb_worktimefund_model_activityrecord.date', '>=', $date),
+                            fn (Builder $query, $date): Builder => $query->where('dpb_worktimefund_model_activityrecord.date', '>=', Carbon::parse($date)->startOfDay()),
                         )
                         ->when(
                             $data['date_to'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('dpb_worktimefund_model_activityrecord.date', '<=', $date),
+                            fn (Builder $query, $date): Builder => $query->where('dpb_worktimefund_model_activityrecord.date', '<=', Carbon::parse($date)->endOfDay()),
                         );
                 })->columns(2),
 
