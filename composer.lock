@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8279cfe304dd5670d729349b86966af2",
+    "content-hash": "aca01ea18802b4f0d99b8fa23702385a",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -1334,12 +1334,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:dp-bratislava/dpb-work-time-fund.git",
-                "reference": "4337f1ac1e9d3ab5c91b50203103d72238da918c"
+                "reference": "d4bdcd5caff981587bb064407b02f847ad00df15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dp-bratislava/dpb-work-time-fund/zipball/4337f1ac1e9d3ab5c91b50203103d72238da918c",
-                "reference": "4337f1ac1e9d3ab5c91b50203103d72238da918c",
+                "url": "https://api.github.com/repos/dp-bratislava/dpb-work-time-fund/zipball/d4bdcd5caff981587bb064407b02f847ad00df15",
+                "reference": "d4bdcd5caff981587bb064407b02f847ad00df15",
                 "shasum": ""
             },
             "require": {
@@ -1380,7 +1380,7 @@
                     "email": "babocky.lubos@dpb.sk"
                 }
             ],
-            "time": "2026-09-04T12:03:14+00:00"
+            "time": "2026-09-08T13:59:38+00:00"
         },
         {
             "name": "dpb/dpb-work-time-fund-filament",
@@ -1388,12 +1388,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:dp-bratislava/dpb-work-time-fund-filament.git",
-                "reference": "d2a55ba9b05790bd65fb9ba3c83c9df150f9a883"
+                "reference": "c146014c07a74525336f53f32a4af00114cf8837"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dp-bratislava/dpb-work-time-fund-filament/zipball/d2a55ba9b05790bd65fb9ba3c83c9df150f9a883",
-                "reference": "d2a55ba9b05790bd65fb9ba3c83c9df150f9a883",
+                "url": "https://api.github.com/repos/dp-bratislava/dpb-work-time-fund-filament/zipball/c146014c07a74525336f53f32a4af00114cf8837",
+                "reference": "c146014c07a74525336f53f32a4af00114cf8837",
                 "shasum": ""
             },
             "require": {
@@ -1422,20 +1422,20 @@
                     "email": "babocky.lubos@dpb.sk"
                 }
             ],
-            "time": "2026-09-04T12:02:33+00:00"
+            "time": "2026-09-08T14:00:35+00:00"
         },
         {
             "name": "dpb/dpb-wtf-tms-bridge",
-            "version": "dev-release/v12.5.14",
+            "version": "dev-release/v12.5.15",
             "source": {
                 "type": "git",
                 "url": "git@github.com:dp-bratislava/dpb-wtf-tms-bridge.git",
-                "reference": "168acf8980a4139901b3aba0144888cb96fb8218"
+                "reference": "5aef5b86fffc3f2a53615bf29ac6fef31dcaa101"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dp-bratislava/dpb-wtf-tms-bridge/zipball/168acf8980a4139901b3aba0144888cb96fb8218",
-                "reference": "168acf8980a4139901b3aba0144888cb96fb8218",
+                "url": "https://api.github.com/repos/dp-bratislava/dpb-wtf-tms-bridge/zipball/5aef5b86fffc3f2a53615bf29ac6fef31dcaa101",
+                "reference": "5aef5b86fffc3f2a53615bf29ac6fef31dcaa101",
                 "shasum": ""
             },
             "require": {
@@ -1466,7 +1466,7 @@
                     "email": "babocky.lubos@dpb.sk"
                 }
             ],
-            "time": "2026-09-04T12:02:04+00:00"
+            "time": "2026-09-08T14:02:42+00:00"
         },
         {
             "name": "dpb/ext-spatie-model-states",
@@ -16479,7 +16479,7 @@
         },
         {
             "package": "dpb/dpb-wtf-tms-bridge",
-            "version": "dev-release/v12.5.14",
+            "version": "dev-release/v12.5.15",
             "alias": "12.5.15",
             "alias_normalized": "12.5.15.0"
         }
