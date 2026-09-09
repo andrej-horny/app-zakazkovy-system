@@ -20,7 +20,7 @@ interface ReportDriver
     /**
      * Get the icon for this driver (heroicon names)
      */
-    public function getQuery(): Builder;
+    public function getQuery($livewire): Builder;
 
     /**
      * Get the columns configuration for the table

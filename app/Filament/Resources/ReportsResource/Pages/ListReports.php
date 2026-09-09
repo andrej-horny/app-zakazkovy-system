@@ -11,6 +11,8 @@ use Filament\Resources\Pages\ListRecords;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
+use App\Filament\Resources\ReportsResource\Widgets\ReportFilters;
+use Livewire\Attributes\On;
 
 class ListReports extends ListRecords
 {
@@ -18,11 +20,58 @@ class ListReports extends ListRecords
 
     public ?string $currentReportType = null;
 
+    public array $reportFilters = [
+        'date_from' => null,
+        'date_to' => null,
+        'departments' => [],
+    ];
+
     public function mount(): void
     {
         parent::mount();
-        // Initialize from query parameter or default
-        $this->currentReportType = request()->query('report', 'work-activity');
+
+        $this->currentReportType = request()->query(
+            'report',
+            'work-activity'
+        );
+
+        $this->reportFilters = [
+            'date_from' => now()
+                ->subDays(120)
+                ->format('Y-m-d'),
+            'date_to' => now()->format('Y-m-d'),
+            'departments' => [],
+        ];
+    }
+
+    #[On('report-filters-applied')]
+    public function applyReportFilters(array $filters): void
+    {
+        $this->reportFilters = [
+            'date_from' => $filters['date_from'] ?? null,
+            'date_to' => $filters['date_to'] ?? null,
+            'departments' => array_values(
+                array_map(
+                    'intval',
+                    $filters['departments'] ?? []
+                ),
+            ),
+        ];
+        $this->resetTable();
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        // Both report drivers read the applied shared filters back from
+        // $this->reportFilters inside their getQuery(), so the header widget is
+        // required for them.
+        if (! in_array($this->currentReportType, ['sumar', 'work-activity'], true)) {
+            return [];
+        }
+
+        return [
+            ReportFilters::class,
+        ];
     }
 
     public function getTitle(): string|Htmlable
@@ -134,3 +183,4 @@ class ListReports extends ListRecords
         return $validator->validate($from, $to);
     }
 }
+

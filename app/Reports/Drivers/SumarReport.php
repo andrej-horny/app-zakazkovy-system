@@ -5,22 +5,18 @@ namespace App\Reports\Drivers;
 use App\Filament\Components\DurationColumn;
 use App\Filament\Exports\Reports\SumarReportExporter;
 use App\Models\Reports\WorktimeFundPerformanceReport;
-use App\Services\DateRangeValidator;
-use Dpb\DatahubSync\Models\Department;
+use Carbon\Carbon;
 use Dpb\Departments\Services\DepartmentService;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Placeholder;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Query\Expression;
-use Illuminate\Support\HtmlString;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class SumarReport implements ReportDriver
 {
     private ?DepartmentService $departmentService = null;
+
+    private ?Collection $availableDepartmentIds = null;
 
     public function __construct()
     {
@@ -37,25 +33,72 @@ class SumarReport implements ReportDriver
         return 'Práce sumár';
     }
 
-    public function getQuery(): Builder
+    public function getQuery($livewire): Builder
     {
+        $pageFilters = $livewire->reportFilters ?? [];
+        $departments = $pageFilters['departments'] ?? [];
+        $dateFrom = $pageFilters['date_from'] ?? null;
+        $dateTo = $pageFilters['date_to'] ?? null;
+
+        $permittedDepartmentIds = $this->getPermittedDepartmentIds();
+
+        $aggregated = WorktimeFundPerformanceReport::query()
+            ->select([
+                'department_id',
+                'personal_id',
+                DB::raw('SUM(real_duration) AS suma_cas_skutocny'),
+                DB::raw('SUM(expected_duration) AS suma_cas_norma'),
+            ])
+            ->where('type', 'O')
+
+            ->whereIn('department_id', $permittedDepartmentIds)
+
+            ->when($departments, function ($query) use ($departments) {
+                return $query->whereIn('department_id', $departments);
+            })
+            ->when($dateFrom && $dateTo, function ($query) use ($dateFrom, $dateTo) {
+
+                $start = Carbon::parse($dateFrom)->startOfDay();
+                $end = Carbon::parse($dateTo)->addDay()->startOfDay();
+
+                return $query
+                    ->where('date', '>=', $start)
+                    ->where('date', '<', $end);
+            })
+            ->groupBy('department_id', 'personal_id');
+
         return WorktimeFundPerformanceReport::query()
+            ->fromSub($aggregated, 'a')
+            ->leftJoin(
+                'datahub_employee_contracts as c',
+                'c.pid',
+                '=',
+                'a.personal_id'
+            )
+            ->leftJoin(
+                'datahub_employees as de',
+                'de.id',
+                '=',
+                'c.datahub_employee_id'
+            )
+            ->leftJoin(
+                'datahub_departments as d',
+                'd.id',
+                '=',
+                'a.department_id'
+            )
             ->select([
                 'd.code as stredisko',
-                new Expression('
-                    ROW_NUMBER() OVER (ORDER BY c.pid) as id
-                '),
-                new Expression("TRIM(LEADING '0' FROM c.pid) as osob_cislo"),
-                new Expression("CONCAT(wt.last_name, ' ', wt.first_name) AS meno"),
-                new Expression('SUM(dpb_worktimefund_model_activityrecord.real_duration) AS suma_cas_skutocny'),
-                new Expression('SUM(dpb_worktimefund_model_activityrecord.expected_duration) AS suma_cas_norma'),
-                new Expression('ROUND(100 * SUM(dpb_worktimefund_model_activityrecord.expected_duration) / SUM(dpb_worktimefund_model_activityrecord.real_duration), 0) AS plnenie'),
-            ])
-            ->leftJoin('dpb_worktimefund_model_worktime as wt', 'wt.id', '=', 'dpb_worktimefund_model_activityrecord.parent_id')
-            ->leftJoin('datahub_employee_contracts as c', 'c.pid', '=', 'wt.personal_id')
-            ->leftJoin('datahub_departments as d', 'd.id', '=', 'c.datahub_department_id')
-            ->where('dpb_worktimefund_model_activityrecord.type', 'O')
-            ->groupBy('c.pid', 'wt.last_name', 'wt.first_name', 'd.code');
+                DB::raw('ROW_NUMBER() OVER (ORDER BY c.pid) as id'),
+                DB::raw("TRIM(LEADING '0' FROM c.pid) as osob_cislo"),
+                DB::raw("CONCAT(de.last_name, ' ', de.first_name) AS meno"),
+                'a.suma_cas_skutocny',
+                'a.suma_cas_norma',
+                DB::raw('ROUND(
+                    100 * a.suma_cas_norma / NULLIF(a.suma_cas_skutocny, 0),
+                    0
+                ) AS plnenie'),
+            ]);
     }
 
     public function getColumns(): array
@@ -78,69 +121,8 @@ class SumarReport implements ReportDriver
 
     public function getFilters(): array
     {
-        $validator = new DateRangeValidator(120);
-
-        return [
-            Filter::make('date_range')
-                ->form([
-                    DatePicker::make('date_from')
-                        ->label('Dátum od')
-                        ->default(now()->subDays(120)->format('Y-m-d')) // Prefills 120 days ago
-                        ->live(onBlur: true),
-                    DatePicker::make('date_to')
-                        ->label('Dátum do')
-                        ->default(now()->format('Y-m-d')) // Prefills today
-                        ->live(onBlur: true),
-                    Placeholder::make('date_error')
-                        ->content(function ($get) use ($validator) {
-                            $from = $get('date_from');
-                            $to = $get('date_to');
-                            $validation = $validator->validate($from, $to);
-
-                            if (! $validation['isValid']) {
-                                return new HtmlString('
-                                    <span style="color: red">
-                                        '.$validation['error'].'
-                                    </span>
-                                ');
-                            }
-
-                            return '';
-                        })
-                        ->hiddenLabel(),
-                ])
-                ->query(function (Builder $query, array $data) use ($validator): Builder {
-                    if ($data['date_from'] && $data['date_to']) {
-                        if (! $validator->validate($data['date_from'], $data['date_to'])['isValid']) {
-                            return $query->whereRaw('1 = 0');
-                        }
-                    }
-
-                    return $query
-                        ->when(
-                            $data['date_from'],
-                            fn (Builder $query, $date): Builder => $query->where('dpb_worktimefund_model_activityrecord.date', '>=', Carbon::parse($date)->startOfDay()),
-                        )
-                        ->when(
-                            $data['date_to'],
-                            fn (Builder $query, $date): Builder => $query->where('dpb_worktimefund_model_activityrecord.date', '<=', Carbon::parse($date)->endOfDay()),
-                        );
-                })->columns(2),
-
-            SelectFilter::make('department')
-                ->label(__('reports/detail-report.table.filters.department'))
-                ->options(fn (DepartmentService $departmentSvc) => Department::whereIn('id', $departmentSvc->getAvailableDepartments()->pluck('id'))->pluck('code', 'code'))
-                ->multiple()
-                ->searchable()
-                ->query(function (Builder $query, array $data): Builder {
-                    return $query->when(
-                        $data['values'],
-                        fn (Builder $query, $values): Builder => $query->whereIn('d.code', $values)
-                    );
-                }),
-        ];
+        return [];
     }
-
     public function getSortColumn(): string
     {
         return 'id';
@@ -163,7 +145,14 @@ class SumarReport implements ReportDriver
 
     public function applyQueryModifications(Builder $query): Builder
     {
-        return $query->whereIn('d.code', $this->departmentService->getAvailableDepartments()->pluck('code'));
+        return $query;
+    }
+
+    private function getPermittedDepartmentIds(): Collection
+    {
+        return $this->availableDepartmentIds ??= $this->departmentService
+            ->getAvailableDepartments()
+            ->pluck('id');
     }
 
     public function lastSyncedAt(): ?string
@@ -171,3 +160,4 @@ class SumarReport implements ReportDriver
         return 'teraz';
     }
 }
+

@@ -6,22 +6,21 @@ use App\Filament\Components\DurationColumn;
 use App\Filament\Exports\Reports\DetailReportExporter;
 use App\Models\Reports\WorkActivityReport;
 use App\Models\Snapshots\WorkTaskSubject;
-use App\Services\DateRangeValidator;
 use Carbon\CarbonInterval;
 use Dpb\DatahubSync\Models\Department;
 use Dpb\Departments\Services\DepartmentService;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Placeholder;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\HtmlString;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Carbon;
 
 class DetailReport implements ReportDriver
 {
     private ?DepartmentService $departmentService = null;
+
+    private ?Collection $permittedDepartmentIds = null;
+
+    private ?Collection $permittedDepartmentCodes = null;
 
     public function __construct()
     {
@@ -38,17 +37,41 @@ class DetailReport implements ReportDriver
         return __('reports/detail-report.navigation.label');
     }
 
-    public function getQuery(): Builder
+    public function getQuery($livewire): Builder
     {
-        return WorkActivityReport::query();
+        // Filters are provided by the shared header ReportFilters widget via the page.
+        $pageFilters = $livewire->reportFilters ?? [];
+        $departments = $pageFilters['departments'] ?? [];
+        $dateFrom = $pageFilters['date_from'] ?? null;
+        $dateTo = $pageFilters['date_to'] ?? null;
+
+        // The view carries both department_id and department_code, so the integer
+        // ids dispatched by the widget map straight onto department_id.
+        return WorkActivityReport::query()
+            // Always restrict to the departments the user is allowed to see.
+            ->whereIn('department_id', $this->getPermittedDepartmentIds())
+            // Additionally restrict to the selection made in the header widget
+            // (only when something was selected; empty = all permitted ones).
+            ->when($departments, function (Builder $query) use ($departments) {
+                return $query->whereIn('department_id', $departments);
+            })
+            // Sargable, index-friendly range that includes the whole date_to day.
+            ->when($dateFrom && $dateTo, function (Builder $query) use ($dateFrom, $dateTo) {
+                $start = Carbon::parse($dateFrom)->startOfDay();
+                $end = Carbon::parse($dateTo)->addDay()->startOfDay();
+
+                return $query
+                    ->where('activity_date', '>=', $start)
+                    ->where('activity_date', '<', $end);
+            });
     }
 
     public function getColumns(): array
     {
-        $departmentValues = $this->departmentService->getAvailableDepartments()->pluck('code');
+        $departmentCodes = $this->getPermittedDepartmentCodes();
 
         $subjectTypesWithDepartments = WorkTaskSubject::query()
-            ->whereIn('department_code', $departmentValues)
+            ->whereIn('department_code', $departmentCodes)
             ->select('subject_type', 'department_code')
             ->distinct()
             ->get()
@@ -71,16 +94,25 @@ class DetailReport implements ReportDriver
                         ->join(', ');
                 })
                 ->hidden(function ($livewire) use ($allowedDepartments) {
-                    $filterState = $livewire->getTableFilterState('department');
-                    $selectedDepartments = $filterState['values'] ?? null;
+                    // Departments selected in the shared header ReportFilters
+                    // widget are stored on the page as integer department ids.
+                    $selectedDepartmentIds = $livewire->reportFilters['departments'] ?? [];
 
-                    // If no filter is applied, show the column
-                    if (blank($selectedDepartments)) {
+                    // If no departments are selected, show every applicable column.
+                    if (blank($selectedDepartmentIds)) {
                         return false;
                     }
 
-                    // Hide the column if the selected filter value is not in the allowed departments for this type
-                    return empty(array_intersect($selectedDepartments, $allowedDepartments));
+                    // Translate the selected ids back to codes so we can compare
+                    // against the codes allowed for this subject type.
+                    $selectedCodes = Department::query()
+                        ->whereIn('id', $selectedDepartmentIds)
+                        ->pluck('code')
+                        ->toArray();
+
+                    // Hide the column if none of the selected departments is
+                    // allowed for this subject type.
+                    return empty(array_intersect($selectedCodes, $allowedDepartments));
                 });
         }
 
@@ -145,73 +177,9 @@ class DetailReport implements ReportDriver
 
     public function getFilters(): array
     {
-        $validator = new DateRangeValidator(120);
-
-        return [
-            Filter::make('date_range')
-                ->form([
-                    DatePicker::make('date_from')
-                        ->label('Dátum od')
-                        ->default(now()->subDays(120)->format('Y-m-d')) // Prefills 120 days ago
-                        ->live(onBlur: true),
-                    DatePicker::make('date_to')
-                        ->label('Dátum do')
-                        ->default(now()->format('Y-m-d')) // Prefills today
-                        ->live(onBlur: true),
-                    Placeholder::make('date_error')
-                        ->content(function ($get) use ($validator) {
-                            $from = $get('date_from');
-                            $to = $get('date_to');
-                            $validation = $validator->validate($from, $to);
-
-                            if (! $validation['isValid']) {
-                                return new HtmlString('
-                                    <span style="color: red">
-                                        '.$validation['error'].'
-                                    </span>
-                                ');
-                            }
-
-                            return '';
-                        })
-                        ->hiddenLabel(),
-                ])
-                ->query(function (Builder $query, array $data) use ($validator): Builder {
-                    // Validate the date range before querying
-                    if ($data['date_from'] && $data['date_to']) {
-                        if (! $validator->validate($data['date_from'], $data['date_to'])['isValid']) {
-                            return $query->whereRaw('1 = 0');
-                        }
-                    }
-
-                    return $query
-                        ->when(
-                            $data['date_from'],
-                            fn (Builder $query, $date): Builder => $query->where(
-                                'activity_date',
-                                '>=',
-                                Carbon::parse($date)->startOfDay()
-                            )
-                        )
-                        ->when(
-                            $data['date_to'],
-                            fn (Builder $query, $date): Builder => $query->where(
-                                'activity_date',
-                                '<=',
-                                Carbon::parse($date)->endOfDay()
-                            )
-                        );
-                })
-                ->columns(2),
-
-            // department
-            SelectFilter::make('department')
-                ->label(__('reports/detail-report.table.filters.department'))
-                ->options(fn (DepartmentService $departmentSvc) => Department::whereIn('id', $departmentSvc->getAvailableDepartments()->pluck('id'))->pluck('code', 'code'))
-                ->multiple()
-                ->searchable()
-                ->attribute('department_code'),
-        ];
+        // Filtering is handled by the shared header ReportFilters widget and
+        // applied directly inside getQuery(), so no inline table filters are needed.
+        return [];
     }
 
     public function getSortColumn(): string
@@ -236,8 +204,11 @@ class DetailReport implements ReportDriver
 
     public function applyQueryModifications(Builder $query): Builder
     {
+        // Defense in depth. Redundant with the subquery/where-in filters but
+        // cheap, and it preserves the taskSubjects eager loading that the
+        // dynamic subject columns depend on.
         return $query
-            ->whereIn('department_code', $this->departmentService->getAvailableDepartments()->pluck('code'))
+            ->whereIn('department_id', $this->getPermittedDepartmentIds())
             ->with('taskSubjects');
     }
 
@@ -245,4 +216,29 @@ class DetailReport implements ReportDriver
     {
         return WorkActivityReport::getLastSyncedAt();
     }
+
+    /**
+     * IDs of the departments the current user is allowed to view.
+     *
+     * @return Collection<int, int>
+     */
+    private function getPermittedDepartmentIds(): Collection
+    {
+        return $this->permittedDepartmentIds ??= $this->departmentService
+            ->getAvailableDepartments()
+            ->pluck('id');
+    }
+
+    /**
+     * Codes of the departments the current user is allowed to view.
+     *
+     * @return Collection<int, string>
+     */
+    private function getPermittedDepartmentCodes(): Collection
+    {
+        return $this->permittedDepartmentCodes ??= $this->departmentService
+            ->getAvailableDepartments()
+            ->pluck('code');
+    }
 }
+

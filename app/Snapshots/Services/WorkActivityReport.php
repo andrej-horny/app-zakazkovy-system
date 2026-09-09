@@ -108,7 +108,7 @@ class WorkActivityReport extends Snapshot
             'wtf_task_created_at' => 'wt.created_at',
 
             // missing join placeholder
-            'department_id' => 'NULL',
+            'department_id' => 'wt.department_id',
 
             // audit
             'source_deleted_at' => 'ar.deleted_at',

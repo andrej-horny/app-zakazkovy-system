@@ -29,11 +29,11 @@ class ReportsResource extends Resource
         // Get the report type from the Livewire component (page) instead of request
         $livewire = $table->getLivewire();
         $reportType = $livewire->currentReportType ?? request()->query('report');
-
+        
         $driver = ReportFactory::make($reportType);
 
         return $table
-            ->query($driver->getQuery())
+            ->query($driver->getQuery($livewire))    
             ->modifyQueryUsing(function ($query) use ($driver) {
                 return $driver->applyQueryModifications($query);
             })
