@@ -29,12 +29,7 @@ class DetailReportExporter extends BaseReportExporter
             $departmentCodes = $this->departmentService->getAvailableDepartments()->pluck('code')->toArray();
         }
         $subjectTypes = DB::table('mvw_work_task_subject_snapshots AS wtss')
-            ->whereExists(function ($query) use ($departmentCodes) {
-                $query->select(DB::raw(1))
-                    ->from('mvw_work_activity_report_v2 AS ar')
-                    ->whereColumn('ar.wtf_task_id', 'wtss.wtf_task_id')
-                    ->whereIn('ar.department_code', $departmentCodes);
-            })
+            ->whereIn('wtss.department_code', $departmentCodes)
             ->distinct()
             ->pluck('wtss.subject_type')
             ->toArray();
@@ -61,7 +56,7 @@ class DetailReportExporter extends BaseReportExporter
     protected function columns(): array
     {
         return [
-            ['key' => 'department_code', 'label' => 'Stredisko'],
+            ['key' => 'ar.department_code', 'label' => 'Stredisko'],
             ['key' => 'task_created_at', 'label' => 'Čas vytvorenia zákazky'],
             ['key' => 'activity_is_fulfilled_label', 'label' => 'Splnené'],
             ['key' => 'task_date', 'label' => 'Dátum zákazky', 'type' => 'date'],
@@ -111,10 +106,10 @@ class DetailReportExporter extends BaseReportExporter
             ->when(data_get($filters, 'date_range.date_from'), fn ($q, $v) => $q->whereDate('activity_date', '>=', $v))
             ->when(data_get($filters, 'date_range.date_to'), fn ($q, $v) => $q->whereDate('activity_date', '<=', $v))
             ->when(! empty($departmentCodes), function ($q) use ($departmentCodes) {
-                $q->whereIn('department_code', $departmentCodes);
+                $q->whereIn('ar.department_code', $departmentCodes);
             })
             // Always apply available departments filter (same as applyQueryModifications)
-            ->whereIn('department_code', $this->departmentService->getAvailableDepartments()->pluck('code'));
+            ->whereIn('ar.department_code', $this->departmentService->getAvailableDepartments()->pluck('code'));
 
         return $result;
     }
