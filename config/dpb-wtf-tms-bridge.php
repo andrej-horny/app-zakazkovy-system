@@ -20,6 +20,12 @@ return [
             'view' => 'dpb-wtf-tms-bridge::filament.pages.daily-maintenance-work-orders-page',
             'navigation_icon' => 'heroicon-o-calendar-days',
         ],
+        'task_batch_work_orders' => [
+            'navigation_label' => 'Práca pre heromadné zákazky',
+            'slug' => 'task-batch-work-orders',
+            'view' => 'dpb-wtf-tms-bridge::filament.pages.task-batch-work-orders-page',
+            'navigation_icon' => 'heroicon-o-calendar-days',
+        ],
     ],
 
     /*

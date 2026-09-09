@@ -19,6 +19,7 @@ use Dpb\WorkTimeFundFilament\Filament\Pages\OfficialTasksManagementPage;
 use Dpb\WorkTimeFundFilament\Filament\Pages\OperationsManagementPage;
 use Dpb\WorkTimeFundFilament\Filament\Pages\WorktimeManagementPage;
 use Dpb\WtfTmsBridge\Filament\Pages\DailyMaintenanceWorkOrdersPage;
+use Dpb\WtfTmsBridge\Filament\Pages\TaskBatchWorkOrdersPage;
 use Dpb\WtfTmsBridge\Filament\Pages\WorkOrderPage;
 
 return [
@@ -35,6 +36,7 @@ return [
                 DeferredTasksManagementPage::getAccessPermission(),
                 WorkOrderPage::getAccessPermission(),
                 DailyMaintenanceWorkOrdersPage::getAccessPermission(),
+                TaskBatchWorkOrdersPage::getAccessPermission(),
                 // Components
                 DepartmentSwitcherComponent::getAccessPermission(),
                 SpotlightTriggerComponent::getAccessPermission(),
