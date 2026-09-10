@@ -42,7 +42,7 @@
     "require": {
         "php": "^8.2",
         "deployer/deployer": "^7.4",
-        "dpb/dpb-wtf-tms-bridge": "dev-release/v12.5.15 as 12.5.15",
+        "dpb/dpb-wtf-tms-bridge": "dev-release/v12.5.15-test as 12.5.15",
         "dpb/filament-admin-panel": "^5.0",
         "dpb/laravel-datahub-sync": "^12.4",
         "dpb/laravel-user-admin": "^5.1",
@@ -54,7 +54,7 @@
         "dpb/dpb-insights": "^12.5",
         "dpb/dpb-master-permission-guard": "^12.5",
         "dpb/dpb-utils": "^12.5",
-        "dpb/dpb-work-time-fund": "dev-release/v12.5.20 as 12.5.20",
+        "dpb/dpb-work-time-fund": "dev-release/v12.5.20-test as 12.5.20",
         "dpb/dpb-work-time-fund-filament": "dev-release/v12.5.10 as 12.5.10",
         "dpb/ext-spatie-model-states": "^12.0",
         "dpb/pkg-activities": "^12.0",

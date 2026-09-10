@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aca01ea18802b4f0d99b8fa23702385a",
+    "content-hash": "311d4ee85f80ce8b7f9537900f8c3b7f",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -1330,16 +1330,16 @@
         },
         {
             "name": "dpb/dpb-work-time-fund",
-            "version": "dev-release/v12.5.20",
+            "version": "dev-release/v12.5.20-test",
             "source": {
                 "type": "git",
                 "url": "git@github.com:dp-bratislava/dpb-work-time-fund.git",
-                "reference": "d4bdcd5caff981587bb064407b02f847ad00df15"
+                "reference": "b8339c72cef5019007a16710a0ca6636d5231a6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dp-bratislava/dpb-work-time-fund/zipball/d4bdcd5caff981587bb064407b02f847ad00df15",
-                "reference": "d4bdcd5caff981587bb064407b02f847ad00df15",
+                "url": "https://api.github.com/repos/dp-bratislava/dpb-work-time-fund/zipball/b8339c72cef5019007a16710a0ca6636d5231a6f",
+                "reference": "b8339c72cef5019007a16710a0ca6636d5231a6f",
                 "shasum": ""
             },
             "require": {
@@ -1380,7 +1380,7 @@
                     "email": "babocky.lubos@dpb.sk"
                 }
             ],
-            "time": "2026-09-08T13:59:38+00:00"
+            "time": "2026-09-10T15:09:31+00:00"
         },
         {
             "name": "dpb/dpb-work-time-fund-filament",
@@ -1426,16 +1426,16 @@
         },
         {
             "name": "dpb/dpb-wtf-tms-bridge",
-            "version": "dev-release/v12.5.15",
+            "version": "dev-release/v12.5.15-test",
             "source": {
                 "type": "git",
                 "url": "git@github.com:dp-bratislava/dpb-wtf-tms-bridge.git",
-                "reference": "5aef5b86fffc3f2a53615bf29ac6fef31dcaa101"
+                "reference": "a49adbccde2074d15d5b39d468b0291a93bf1aab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dp-bratislava/dpb-wtf-tms-bridge/zipball/5aef5b86fffc3f2a53615bf29ac6fef31dcaa101",
-                "reference": "5aef5b86fffc3f2a53615bf29ac6fef31dcaa101",
+                "url": "https://api.github.com/repos/dp-bratislava/dpb-wtf-tms-bridge/zipball/a49adbccde2074d15d5b39d468b0291a93bf1aab",
+                "reference": "a49adbccde2074d15d5b39d468b0291a93bf1aab",
                 "shasum": ""
             },
             "require": {
@@ -1466,7 +1466,7 @@
                     "email": "babocky.lubos@dpb.sk"
                 }
             ],
-            "time": "2026-09-08T14:02:42+00:00"
+            "time": "2026-09-10T15:07:59+00:00"
         },
         {
             "name": "dpb/ext-spatie-model-states",
@@ -16467,7 +16467,7 @@
     "aliases": [
         {
             "package": "dpb/dpb-work-time-fund",
-            "version": "dev-release/v12.5.20",
+            "version": "dev-release/v12.5.20-test",
             "alias": "12.5.20",
             "alias_normalized": "12.5.20.0"
         },
@@ -16479,7 +16479,7 @@
         },
         {
             "package": "dpb/dpb-wtf-tms-bridge",
-            "version": "dev-release/v12.5.15",
+            "version": "dev-release/v12.5.15-test",
             "alias": "12.5.15",
             "alias_normalized": "12.5.15.0"
         }
