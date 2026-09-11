@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "311d4ee85f80ce8b7f9537900f8c3b7f",
+    "content-hash": "15150c5a66dca68263a2f77b49bade52",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -2388,20 +2388,20 @@
         },
         {
             "name": "dpb/wtf-ui",
-            "version": "v12.5.5",
+            "version": "dev-release/v12.5.6-test",
             "source": {
                 "type": "git",
                 "url": "git@github.com:dp-bratislava/dpb-wtf-ui.git",
-                "reference": "118e775986c911ebdfd0f4c7b563f33cca44c182"
+                "reference": "9e29fa50494e9a35c993b2268df09d3fad0d4bdd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dp-bratislava/dpb-wtf-ui/zipball/118e775986c911ebdfd0f4c7b563f33cca44c182",
-                "reference": "118e775986c911ebdfd0f4c7b563f33cca44c182",
+                "url": "https://api.github.com/repos/dp-bratislava/dpb-wtf-ui/zipball/9e29fa50494e9a35c993b2268df09d3fad0d4bdd",
+                "reference": "9e29fa50494e9a35c993b2268df09d3fad0d4bdd",
                 "shasum": ""
             },
             "require": {
-                "dpb/dpb-work-time-fund": "^12.5.0"
+                "dpb/dpb-work-time-fund": "^12.5"
             },
             "type": "library",
             "extra": {
@@ -2428,11 +2428,7 @@
                     "email": "babocky.lubos@dpb.sk"
                 }
             ],
-            "support": {
-                "source": "https://github.com/dp-bratislava/dpb-wtf-ui/tree/v12.5.4",
-                "issues": "https://github.com/dp-bratislava/dpb-wtf-ui/issues"
-            },
-            "time": "2026-06-23T09:33:13+00:00"
+            "time": "2026-09-11T08:53:25+00:00"
         },
         {
             "name": "dragonmantank/cron-expression",
@@ -16482,13 +16478,20 @@
             "version": "dev-release/v12.5.15-test",
             "alias": "12.5.15",
             "alias_normalized": "12.5.15.0"
+        },
+        {
+            "package": "dpb/wtf-ui",
+            "version": "dev-release/v12.5.6-test",
+            "alias": "12.5.6",
+            "alias_normalized": "12.5.6.0"
         }
     ],
     "minimum-stability": "dev",
     "stability-flags": {
         "dpb/dpb-work-time-fund": 20,
         "dpb/dpb-work-time-fund-filament": 20,
-        "dpb/dpb-wtf-tms-bridge": 20
+        "dpb/dpb-wtf-tms-bridge": 20,
+        "dpb/wtf-ui": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
